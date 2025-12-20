@@ -109,8 +109,8 @@ class _DsGalleryPageState extends State<DsGalleryPage> {
       const AppNavigationItem(
         id: 'pay',
         label: 'Pay',
-        icon: Icons.credit_card_outlined,
-        selectedIcon: Icons.credit_card,
+        icon: Icons.receipt_long_outlined,
+        selectedIcon: Icons.receipt_long,
         badgeCount: 3,
       ),
       const AppNavigationItem(
@@ -118,6 +118,12 @@ class _DsGalleryPageState extends State<DsGalleryPage> {
         label: 'Profile',
         icon: Icons.person_outline,
         selectedIcon: Icons.person,
+      ),
+      const AppNavigationItem(
+        id: 'more',
+        label: 'More',
+        icon: Icons.grid_view_outlined,
+        selectedIcon: Icons.grid_view,
       ),
     ];
 
@@ -174,75 +180,7 @@ class _DsGalleryPageState extends State<DsGalleryPage> {
         children: [
           const DsGalleryThemeControls(),
           const Divider(height: 1),
-          Expanded(
-            child: ListView(
-              padding: context.dsSpacing.symmetric(
-                horizontal: s.pagePadding,
-                vertical: s.lg,
-              ),
-              children: <Widget>[
-                Section(
-                  title: 'Buttons',
-                  subtitle: 'Variants, sizes, states (enabled/loading)',
-                  child: _ButtonsDemo(onShowSnackBar: _showSnackBar),
-                ),
-                const AppDivider(),
-
-                Section(
-                  title: 'Cards',
-                  subtitle: 'Variants + header/footer + DS padding',
-                  child: _CardsDemo(),
-                ),
-                const AppDivider(),
-
-                Section(
-                  title: 'Inputs',
-                  subtitle: 'Material 3 inputs with DS standardized API',
-                  child: _InputsDemo(
-                    nameCtrl: _nameCtrl,
-                    dateCtrl: _dateCtrl,
-                    enabled: _inputsEnabled,
-                    showErrors: _showInputErrors,
-                    dropdownValue: _dropdownValue,
-                    onEnabledChanged: (v) => setState(() => _inputsEnabled = v),
-                    onShowErrorsChanged: (v) =>
-                        setState(() => _showInputErrors = v),
-                    onDropdownChanged: (v) =>
-                        setState(() => _dropdownValue = v),
-                  ),
-                ),
-                const AppDivider(),
-
-                Section(
-                  title: 'Data Display',
-                  subtitle: 'ListTile, Chip, Tag, Divider, Avatar',
-                  child: _DataDisplayDemo(),
-                ),
-                const AppDivider(),
-
-                Section(
-                  title: 'Dialogs',
-                  subtitle:
-                      'Alert dialog + bottom sheet (app layer orchestration)',
-                  child: _DialogsDemo(
-                    onShowAlert: _showAlertDialog,
-                    onShowSheet: _showBottomSheet,
-                  ),
-                ),
-                const AppDivider(),
-
-                Section(
-                  title: 'Feedback',
-                  subtitle: 'SnackBar + Toast + Loading + EmptyState',
-                  child: _FeedbackDemo(
-                    onShowSnackBar: _showSnackBar,
-                    onShowToast: _showToast,
-                  ),
-                ),
-                SizedBox(height: s.xl),
-              ],
-            ),
-          ),
+          Expanded(child: _buildPageBody(_bottomBarIndex)),
         ],
       ),
     );
@@ -336,6 +274,37 @@ class _DsGalleryPageState extends State<DsGalleryPage> {
           ),
         );
       },
+    );
+  }
+
+  Widget _buildPageBody(int index) {
+    switch (index) {
+      case 0:
+        return _demoList('Home');
+      case 1:
+        return _demoList('Pay');
+      case 2:
+        return _demoList('Profile');
+      case 3:
+        return _demoList('More');
+      default:
+        return _demoList('Unknown');
+    }
+  }
+
+  Widget _demoList(String title) {
+    return ListView.builder(
+      padding: const EdgeInsets.all(16),
+      itemCount: 40,
+      itemBuilder: (context, i) => Padding(
+        padding: const EdgeInsets.only(bottom: 12),
+        child: AppCard(
+          child: ListTile(
+            title: Text('$title item $i'),
+            subtitle: const Text('Scroll down to test FAB overlap.'),
+          ),
+        ),
+      ),
     );
   }
 

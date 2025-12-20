@@ -60,5 +60,8 @@ class NavigationTokens {
   /// Distance from the bottom edge of the bar content (above safe area) to the FAB bottom.
   static const double bottomBarCenterActionBottomPadding = SpacingTokens.s8;
 
+  // Center action border width (matches bottom bar background)
+  static const double bottomBarCenterActionBorderWidth = SpacingTokens.s2;
+
   const NavigationTokens._();
 }

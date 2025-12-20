@@ -189,6 +189,7 @@ class NavigationMetrics {
   final double bottomBarCenterActionSize;
   final double bottomBarCenterActionDockPaddingX;
   final double bottomBarCenterActionBottomPadding;
+  final double bottomBarCenterActionBorderWidth;
 
   const NavigationMetrics({
     required this.appBarHeight,
@@ -207,6 +208,7 @@ class NavigationMetrics {
     required this.bottomBarCenterActionSize,
     required this.bottomBarCenterActionDockPaddingX,
     required this.bottomBarCenterActionBottomPadding,
+    required this.bottomBarCenterActionBorderWidth,
   });
 
   factory NavigationMetrics.fromTokens() {
@@ -235,6 +237,8 @@ class NavigationMetrics {
           NavigationTokens.bottomBarCenterActionDockPaddingX,
       bottomBarCenterActionBottomPadding:
           NavigationTokens.bottomBarCenterActionBottomPadding,
+      bottomBarCenterActionBorderWidth:
+          NavigationTokens.bottomBarCenterActionBorderWidth,
     );
   }
 }

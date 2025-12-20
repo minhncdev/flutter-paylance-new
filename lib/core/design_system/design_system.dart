@@ -83,7 +83,7 @@ export 'src/components/cards/card_variants.dart';
 // Navigation
 export 'src/components/navigation/app_app_bar.dart';
 export 'src/components/navigation/app_bottom_bar.dart';
-export 'src/components/navigation/app_bottom_bar_with_center_action.dart'; // NEW
+export 'src/components/navigation/app_bottom_bar_center_action.dart'; // NEW
 export 'src/components/navigation/app_drawer.dart';
 export 'src/components/navigation/navigation_item.dart';
 

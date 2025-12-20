@@ -62,9 +62,12 @@ class AppBottomBarWithCenterAction extends StatelessWidget {
         ? MediaQuery.of(context).viewPadding.bottom
         : 0;
 
+    final double borderW = nav.bottomBarCenterActionBorderWidth;
+    final double innerSize = nav.bottomBarCenterActionSize;
+    final double outerSize = innerSize + (borderW * 2);
+
     final double dockWidth =
-        nav.bottomBarCenterActionSize +
-        (nav.bottomBarCenterActionDockPaddingX * 2);
+        outerSize + (nav.bottomBarCenterActionDockPaddingX * 2);
 
     // Split items into left/right groups; reserve the middle dock gap.
     final int leftCount = items.length ~/ 2;
@@ -122,14 +125,33 @@ class AppBottomBarWithCenterAction extends StatelessWidget {
                 bottom: bottomInset + nav.bottomBarCenterActionBottomPadding,
                 child: Center(
                   child: SizedBox.square(
-                    dimension: nav.bottomBarCenterActionSize,
-                    child: centerActionSemanticsLabel == null
-                        ? centerAction
-                        : Semantics(
-                            button: true,
-                            label: centerActionSemanticsLabel,
-                            child: centerAction,
+                    dimension: outerSize,
+                    child: DecoratedBox(
+                      decoration: ShapeDecoration(
+                        shape: CircleBorder(
+                          side: BorderSide(
+                            width: borderW,
+                            color:
+                                scheme.surface, // same as bottom bar background
                           ),
+                        ),
+                      ),
+                      child: Padding(
+                        padding: EdgeInsets.all(borderW),
+                        child: Center(
+                          child: SizedBox.square(
+                            dimension: innerSize,
+                            child: centerActionSemanticsLabel == null
+                                ? centerAction
+                                : Semantics(
+                                    button: true,
+                                    label: centerActionSemanticsLabel,
+                                    child: centerAction,
+                                  ),
+                          ),
+                        ),
+                      ),
+                    ),
                   ),
                 ),
               ),
