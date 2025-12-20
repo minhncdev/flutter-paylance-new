@@ -1,10 +1,9 @@
 // app/bootstrap.dart
 //
 // App bootstrap (UI initialization only).
-// - Builds DS token-driven themes.
-// - Creates routing shell.
+// - Registers DS palette presets.
+// - Creates ThemeController (app shell).
 // - Runs the app.
-// - No business logic, no feature wiring, no platform services.
 
 library;
 
@@ -13,24 +12,33 @@ import 'package:flutter/material.dart';
 import '../core/design_system/design_system.dart';
 import 'app.dart';
 import 'routing/app_router.dart';
+import 'theme/theme_controller.dart';
+
+void _registerPalettePresets() {
+  final r = ThemePaletteRegistry.instance;
+
+  r.register(WhitePreset.preset);
+  r.register(MilkWhitePreset.preset);
+  r.register(DarkPreset.preset);
+  r.register(SemiDarkPreset.preset);
+  r.register(GrayPreset.preset);
+
+  // Optional brand presets:
+  // r.register(GreenBrandPreset.preset);
+}
 
 Future<void> bootstrap() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Build DS themes (token-driven, Material 3).
-  // NOTE: These APIs assume your DS theme layer exposes ThemeData builders.
-  // If your DS uses a different builder signature, adjust here only (app glue).
-  final ThemeData light = AppTheme.light();
-  final ThemeData dark = AppTheme.dark();
+  _registerPalettePresets();
 
-  final router = AppRouter(lightTheme: light, darkTheme: dark);
+  final themeController = ThemeController();
+  final router = const AppRouter();
 
   runApp(
     App(
       router: router,
-      lightTheme: light,
-      darkTheme: dark,
-      themeMode: ThemeMode.system,
+      themeController: themeController,
       supportedLocales: const <Locale>[Locale('en'), Locale('vi')],
     ),
   );

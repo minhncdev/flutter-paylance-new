@@ -22,10 +22,7 @@ class AppRoutes {
 
 @immutable
 class AppRouter {
-  final ThemeData lightTheme;
-  final ThemeData darkTheme;
-
-  const AppRouter({required this.lightTheme, required this.darkTheme});
+  const AppRouter();
 
   String get initialRoute => AppRoutes.home;
 
@@ -40,11 +37,8 @@ class AppRouter {
       case AppRoutes.dsGallery:
         return MaterialPageRoute<void>(
           settings: settings,
-          builder: (_) => DsGalleryPage(
-            // Provide explicit themes so the gallery can toggle light/dark locally if desired.
-            lightTheme: lightTheme,
-            darkTheme: darkTheme,
-          ),
+          // Use ambient Theme from host app (do not pass explicit ThemeData).
+          builder: (_) => const DsGalleryPage(),
         );
 
       default:

@@ -44,6 +44,21 @@ class BrandColorSelection {
     danger: PrimitivePalettes.redScale,
     info: PrimitivePalettes.blueScale,
   );
+
+  // Example brand selections (token-driven).
+  // Keep these as simple preset options; apps can define more if needed.
+
+  static const BrandColorSelection green = BrandColorSelection(
+    primary: PrimitivePalettes.greenScale,
+    secondary: PrimitivePalettes.tealScale,
+    accent: PrimitivePalettes.blueScale,
+    success: PrimitivePalettes.greenScale,
+    warning: PrimitivePalettes.amberScale,
+    danger: PrimitivePalettes.redScale,
+    info: PrimitivePalettes.blueScale,
+  );
+
+  static const BrandColorSelection blue = BrandColorSelection.base;
 }
 
 /// Semantic colors for the app.

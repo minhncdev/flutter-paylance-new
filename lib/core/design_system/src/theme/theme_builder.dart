@@ -14,6 +14,7 @@ import '../foundations/app_typography.dart';
 import '../tokens/color_palette.dart';
 import 'app_color_scheme.dart';
 import 'app_text_theme.dart';
+import 'palette_preset.dart';
 import 'theme_extensions/component_styles_ext.dart';
 import 'theme_extensions/elevation_ext.dart';
 import 'theme_extensions/radii_ext.dart';
@@ -83,6 +84,55 @@ class AppThemeBuilder {
     );
 
     return ThemeBundle(light: light, dark: dark);
+  }
+
+  /// Build a full light/dark ThemeBundle from a palette preset.
+  static ThemeBundle buildFromPreset({
+    required PalettePreset preset,
+    AppThemeConfig? baseConfig,
+  }) {
+    final cfg = baseConfig ?? AppThemeConfig.base();
+
+    final merged = AppThemeConfig(
+      palettes: preset.palettes,
+      brand: preset.brand,
+      typography: cfg.typography,
+      spacing: cfg.spacing,
+      shape: cfg.shape,
+      elevation: cfg.elevation,
+    );
+
+    return build(config: merged);
+  }
+
+  /// Build ThemeData for a single brightness from a palette preset.
+  /// Useful for caching (build only what changed).
+  static ThemeData buildForPreset({
+    required PalettePreset preset,
+    required Brightness brightness,
+    AppThemeConfig? baseConfig,
+  }) {
+    final cfg = baseConfig ?? AppThemeConfig.base();
+
+    final merged = AppThemeConfig(
+      palettes: preset.palettes,
+      brand: preset.brand,
+      typography: cfg.typography,
+      spacing: cfg.spacing,
+      shape: cfg.shape,
+      elevation: cfg.elevation,
+    );
+
+    return _buildFor(
+      brightness: brightness,
+      colors: brightness == Brightness.light
+          ? AppColors.light(palettes: merged.palettes, brand: merged.brand)
+          : AppColors.dark(palettes: merged.palettes, brand: merged.brand),
+      typography: merged.typography,
+      spacing: merged.spacing,
+      shape: merged.shape,
+      elevation: merged.elevation,
+    );
   }
 
   static ThemeData _buildFor({

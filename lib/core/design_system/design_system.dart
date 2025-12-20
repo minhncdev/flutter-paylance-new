@@ -11,6 +11,7 @@ library design_system;
 export 'src/tokens/breakpoint_tokens.dart';
 export 'src/tokens/opacity_tokens.dart';
 export 'src/tokens/motion_tokens.dart';
+export 'src/tokens/color_palette.dart'; // For custom preset creation
 
 // =======================
 // Foundations
@@ -29,6 +30,19 @@ export 'src/theme/app_theme.dart';
 export 'src/theme/app_color_scheme.dart';
 export 'src/theme/app_text_theme.dart';
 export 'src/theme/theme_builder.dart';
+
+// Theme selection + palettes
+export 'src/theme/theme_selection_types.dart';
+export 'src/theme/palette_preset.dart';
+export 'src/theme/palette_registry.dart';
+
+// Presets
+export 'src/theme/presets/white_preset.dart';
+export 'src/theme/presets/milk_white_preset.dart';
+export 'src/theme/presets/dark_preset.dart';
+export 'src/theme/presets/semi_dark_preset.dart';
+export 'src/theme/presets/gray_preset.dart';
+// export 'src/theme/presets/green_brand_preset.dart'; // optional
 
 // Theme extensions (DS API surface)
 export 'src/theme/theme_extensions/ds_extensions.dart';

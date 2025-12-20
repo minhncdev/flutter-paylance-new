@@ -110,6 +110,69 @@ class PrimitivePalettes {
     c950: Color(0xFF0B1220),
   );
 
+  // 1) Add new neutral scales (tone presets)
+  static const ColorScale neutralWarmScale = ColorScale(
+    c0: Color(0xFFFFFDF7),
+    c50: Color(0xFFFFF9EE),
+    c100: Color(0xFFFFF1DD),
+    c200: Color(0xFFF4E7C8),
+    c300: Color(0xFFE2D2B0),
+    c400: Color(0xFFC7B592),
+    c500: Color(0xFF9E8F77),
+    c600: Color(0xFF7B6E5A),
+    c700: Color(0xFF5F5547),
+    c800: Color(0xFF403A31),
+    c900: Color(0xFF2A251F),
+    c950: Color(0xFF17130F),
+  );
+
+  static const ColorScale neutralGrayScale = ColorScale(
+    c0: Color(0xFFFCFCFD),
+    c50: Color(0xFFF7F7F9),
+    c100: Color(0xFFEEF0F3),
+    c200: Color(0xFFDCE0E7),
+    c300: Color(0xFFC3C9D5),
+    c400: Color(0xFF9AA3B2),
+    c500: Color(0xFF6F7888),
+    c600: Color(0xFF4F5764),
+    c700: Color(0xFF39404B),
+    c800: Color(0xFF252A33),
+    c900: Color(0xFF161A20),
+    c950: Color(0xFF0E1116),
+  );
+
+  /// SemiDark: dark mode background is less "pitch black"
+  static const ColorScale neutralSemiDarkScale = ColorScale(
+    c0: Color(0xFFFFFFFF),
+    c50: Color(0xFFF8FAFC),
+    c100: Color(0xFFF1F5F9),
+    c200: Color(0xFFE2E8F0),
+    c300: Color(0xFFCBD5E1),
+    c400: Color(0xFF94A3B8),
+    c500: Color(0xFF64748B),
+    c600: Color(0xFF475569),
+    c700: Color(0xFF334155),
+    c800: Color(0xFF1F2937),
+    c900: Color(0xFF111827),
+    c950: Color(0xFF0B1220),
+  );
+
+  /// Dark: darker background for dark mode
+  static const ColorScale neutralDarkScale = ColorScale(
+    c0: Color(0xFFFFFFFF),
+    c50: Color(0xFFF8FAFC),
+    c100: Color(0xFFF1F5F9),
+    c200: Color(0xFFE2E8F0),
+    c300: Color(0xFFCBD5E1),
+    c400: Color(0xFF94A3B8),
+    c500: Color(0xFF64748B),
+    c600: Color(0xFF475569),
+    c700: Color(0xFF334155),
+    c800: Color(0xFF0F172A),
+    c900: Color(0xFF05070D),
+    c950: Color(0xFF020308),
+  );
+
   static const ColorScale blueScale = ColorScale(
     c0: Color(0xFFF5FAFF),
     c50: Color(0xFFEAF3FF),
@@ -207,6 +270,47 @@ class PrimitivePalettes {
   /// - Brand selection/mapping belongs to semantic layers (NOT here).
   static const PrimitivePalettes base = PrimitivePalettes(
     neutral: neutralScale,
+    blue: blueScale,
+    teal: tealScale,
+    green: greenScale,
+    amber: amberScale,
+    red: redScale,
+    purple: purpleScale,
+  );
+
+  // 2) Add new PrimitivePalettes presets
+  static const PrimitivePalettes milkWhite = PrimitivePalettes(
+    neutral: neutralWarmScale,
+    blue: blueScale,
+    teal: tealScale,
+    green: greenScale,
+    amber: amberScale,
+    red: redScale,
+    purple: purpleScale,
+  );
+
+  static const PrimitivePalettes gray = PrimitivePalettes(
+    neutral: neutralGrayScale,
+    blue: blueScale,
+    teal: tealScale,
+    green: greenScale,
+    amber: amberScale,
+    red: redScale,
+    purple: purpleScale,
+  );
+
+  static const PrimitivePalettes semiDark = PrimitivePalettes(
+    neutral: neutralSemiDarkScale,
+    blue: blueScale,
+    teal: tealScale,
+    green: greenScale,
+    amber: amberScale,
+    red: redScale,
+    purple: purpleScale,
+  );
+
+  static const PrimitivePalettes dark = PrimitivePalettes(
+    neutral: neutralDarkScale,
     blue: blueScale,
     teal: tealScale,
     green: greenScale,
