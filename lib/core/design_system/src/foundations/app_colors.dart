@@ -35,7 +35,7 @@ class BrandColorSelection {
   });
 
   /// Default: uses base palettes (blue/teal/purple + standard status scales).
-  static const BrandColorSelection base = BrandColorSelection(
+  static final BrandColorSelection base = BrandColorSelection(
     primary: PrimitivePalettes.base.blue,
     secondary: PrimitivePalettes.base.teal,
     accent: PrimitivePalettes.base.purple,
