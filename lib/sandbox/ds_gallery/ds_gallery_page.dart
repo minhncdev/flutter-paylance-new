@@ -161,7 +161,7 @@ class _DsGalleryPageState extends State<DsGalleryPage> {
         },
       ),
       bottomNavigationBar: _useCenterActionBottomBar
-          ? AppBottomBarWithCenterAction(
+          ? AppBottomBarCenterAction(
               items: navItems,
               selectedIndex: _bottomBarIndex,
               onSelected: (i) => setState(() => _bottomBarIndex = i),
