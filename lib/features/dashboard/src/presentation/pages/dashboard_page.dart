@@ -1,7 +1,7 @@
 // Role: Dashboard page composed from smaller widgets (header/cards/chart/bottom-nav).
 import 'package:flutter/material.dart';
 
-import 'package:paylance/features/bottom_navigation/src/presentation/widgets/app_bottom_navigation_bar.dart';
+import 'package:paylance/features/navigation/src/presentation/widgets/app_bottom_navigation_bar.dart';
 import '../widgets/dashboard_header.dart';
 import '../widgets/spending_comparison_card.dart';
 import '../widgets/spending_overview_card.dart';
