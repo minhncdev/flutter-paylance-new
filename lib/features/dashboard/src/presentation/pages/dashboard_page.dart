@@ -1,7 +1,7 @@
 // Role: Dashboard page composed from smaller widgets (header/cards/chart/bottom-nav).
 import 'package:flutter/material.dart';
 
-import '../widgets/dashboard_bottom_nav.dart';
+import 'package:paylance/features/bottom_navigation/src/presentation/widgets/app_bottom_navigation_bar.dart';
 import '../widgets/dashboard_header.dart';
 import '../widgets/spending_comparison_card.dart';
 import '../widgets/spending_overview_card.dart';
@@ -43,7 +43,15 @@ class DashboardPage extends StatelessWidget {
           ),
         ],
       ),
-      bottomNavigationBar: const DashboardBottomNav(activeIndex: 0),
+      bottomNavigationBar: AppBottomNavigationBar(
+        activeIndex: 0,
+        onTap: (i) {
+          // TODO: hook routing later
+        },
+        onAddTap: () {
+          // TODO: open add transaction flow later
+        },
+      ),
     );
   }
 }

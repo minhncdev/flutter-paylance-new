@@ -1,14 +1,23 @@
-// Role: Bottom navigation with center add button (floating) like HTML.
+// Role: Reusable bottom navigation with center add button (floating).
 import 'dart:ui';
 import 'package:flutter/material.dart';
 
-// TODO: Replace with your actual DS import path.
-import 'package:paylance/core/design_system/design_system.dart';
+class AppBottomNavigationBar extends StatelessWidget {
+  const AppBottomNavigationBar({
+    super.key,
+    required this.activeIndex,
+    this.onTap,
+    this.onAddTap,
+  });
 
-class DashboardBottomNav extends StatelessWidget {
-  const DashboardBottomNav({super.key, required this.activeIndex});
+  /// 0: Tổng quan, 1: Lịch sử, 2: Kế hoạch, 3: Khác
+  final int activeIndex;
 
-  final int activeIndex; // 0: Tổng quan, 1: Lịch sử, 2: Kế hoạch, 3: Khác
+  /// Called when a tab is tapped (0..3)
+  final ValueChanged<int>? onTap;
+
+  /// Called when the center add button is tapped
+  final VoidCallback? onAddTap;
 
   @override
   Widget build(BuildContext context) {
@@ -16,7 +25,6 @@ class DashboardBottomNav extends StatelessWidget {
     final bg = theme.colorScheme.surface;
     final primary = theme.colorScheme.primary;
     final muted = theme.colorScheme.onSurfaceVariant;
-    final on = theme.colorScheme.onSurface;
 
     return ClipRect(
       child: BackdropFilter(
@@ -39,7 +47,11 @@ class DashboardBottomNav extends StatelessWidget {
                   left: 0,
                   right: 0,
                   child: Center(
-                    child: _AddButton(primary: primary, bg: bg),
+                    child: _AddButton(
+                      primary: primary,
+                      bg: bg,
+                      onTap: onAddTap ?? () {},
+                    ),
                   ),
                 ),
                 Padding(
@@ -53,12 +65,18 @@ class DashboardBottomNav extends StatelessWidget {
                             label: 'Tổng quan',
                             icon: Icons.grid_view_rounded,
                             active: activeIndex == 0,
+                            inactiveColor: muted.withOpacity(0.60),
+                            activeColor: primary,
+                            onTap: () => onTap?.call(0),
                           ),
                           const SizedBox(width: 28),
                           _NavItem(
                             label: 'Lịch sử',
                             icon: Icons.history,
                             active: activeIndex == 1,
+                            inactiveColor: muted.withOpacity(0.60),
+                            activeColor: primary,
+                            onTap: () => onTap?.call(1),
                           ),
                         ],
                       ),
@@ -68,12 +86,18 @@ class DashboardBottomNav extends StatelessWidget {
                             label: 'Kế hoạch',
                             icon: Icons.savings_outlined,
                             active: activeIndex == 2,
+                            inactiveColor: muted.withOpacity(0.60),
+                            activeColor: primary,
+                            onTap: () => onTap?.call(2),
                           ),
                           const SizedBox(width: 28),
                           _NavItem(
                             label: 'Khác',
                             icon: Icons.more_horiz,
                             active: activeIndex == 3,
+                            inactiveColor: muted.withOpacity(0.60),
+                            activeColor: primary,
+                            onTap: () => onTap?.call(3),
                           ),
                         ],
                       ),
@@ -90,17 +114,22 @@ class DashboardBottomNav extends StatelessWidget {
 }
 
 class _AddButton extends StatelessWidget {
-  const _AddButton({required this.primary, required this.bg});
+  const _AddButton({
+    required this.primary,
+    required this.bg,
+    required this.onTap,
+  });
 
   final Color primary;
   final Color bg;
+  final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
     return Semantics(
       label: 'Thêm giao dịch',
       child: InkResponse(
-        onTap: () {},
+        onTap: onTap,
         radius: 34,
         child: Container(
           width: 56,
@@ -128,23 +157,26 @@ class _NavItem extends StatelessWidget {
     required this.label,
     required this.icon,
     required this.active,
+    required this.inactiveColor,
+    required this.activeColor,
+    required this.onTap,
   });
 
   final String label;
   final IconData icon;
   final bool active;
+  final Color inactiveColor;
+  final Color activeColor;
+  final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final primary = theme.colorScheme.primary;
-    final muted = theme.colorScheme.onSurfaceVariant;
-
-    final color = active ? primary : muted.withOpacity(0.60);
+    final color = active ? activeColor : inactiveColor;
     final weight = active ? FontWeight.w800 : FontWeight.w700;
 
     return InkResponse(
-      onTap: () {},
+      onTap: onTap,
       child: SizedBox(
         width: 52,
         child: Column(
