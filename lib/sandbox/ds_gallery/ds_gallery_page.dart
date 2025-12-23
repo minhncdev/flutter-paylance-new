@@ -1,9 +1,9 @@
 // sandbox/ds_gallery/ds_gallery_page.dart
 //
-// DS Gallery page (sandbox only).
-// - Showcases Design System components under the current Theme.
-// - No business logic; only demo UI states.
+// DS Gallery entry page (sandbox only).
+// - Provides navigation between preview pages.
 // - Can locally toggle light/dark if host provides lightTheme/darkTheme.
+// - No business logic; only demo UI states.
 
 library;
 
@@ -16,6 +16,63 @@ import '../../app/theme/theme_controller.dart';
 import '../../app/theme/theme_controller_scope.dart';
 import '../../app/theme/theme_selection_config.dart';
 import '../../app/config/brand_defaults.dart';
+
+typedef DsGalleryNavigate = void Function(String id);
+
+@immutable
+class _GalleryTab {
+  final String title;
+  final AppNavigationItem item;
+  const _GalleryTab({required this.title, required this.item});
+}
+
+const List<_GalleryTab> _kGalleryTabs = <_GalleryTab>[
+  _GalleryTab(
+    title: 'Overview',
+    item: AppNavigationItem(
+      id: 'overview',
+      label: 'Overview',
+      icon: Icons.dashboard_outlined,
+      selectedIcon: Icons.dashboard,
+    ),
+  ),
+  _GalleryTab(
+    title: 'Foundations',
+    item: AppNavigationItem(
+      id: 'foundations',
+      label: 'Foundations',
+      icon: Icons.layers_outlined,
+      selectedIcon: Icons.layers,
+    ),
+  ),
+  _GalleryTab(
+    title: 'Components',
+    item: AppNavigationItem(
+      id: 'components',
+      label: 'Components',
+      icon: Icons.widgets_outlined,
+      selectedIcon: Icons.widgets,
+    ),
+  ),
+  _GalleryTab(
+    title: 'Feedback',
+    item: AppNavigationItem(
+      id: 'feedback',
+      label: 'Feedback',
+      icon: Icons.notifications_outlined,
+      selectedIcon: Icons.notifications,
+    ),
+  ),
+  _GalleryTab(
+    title: 'Settings',
+    item: AppNavigationItem(
+      id: 'settings',
+      label: 'Settings',
+      icon: Icons.tune_outlined,
+      selectedIcon: Icons.tune,
+    ),
+  ),
+];
 
 @immutable
 class DsGalleryPage extends StatefulWidget {
@@ -40,13 +97,13 @@ class DsGalleryPage extends StatefulWidget {
 
 class _DsGalleryPageState extends State<DsGalleryPage> {
   late ThemeMode _mode = widget.initialThemeMode;
+  int _tabIndex = 0;
 
   // Inputs demo state (UI-only).
   final TextEditingController _nameCtrl = TextEditingController();
   final TextEditingController _dateCtrl = TextEditingController();
 
   String? _dropdownValue;
-
   bool _inputsEnabled = true;
   bool _showInputErrors = false;
 
@@ -54,15 +111,16 @@ class _DsGalleryPageState extends State<DsGalleryPage> {
   OverlayEntry? _toastEntry;
   Timer? _toastTimer;
 
-  int _bottomBarIndex = 0;
-  bool _useCenterActionBottomBar = true;
+  // Navigation preview demo state (UI-only).
+  int _navPreviewIndex = 0;
+  bool _navPreviewUseCenterAction = true;
 
   @override
   void dispose() {
-    _toastTimer?.cancel();
-    _toastEntry?.remove();
     _nameCtrl.dispose();
     _dateCtrl.dispose();
+    _toastTimer?.cancel();
+    _toastEntry?.remove();
     super.dispose();
   }
 
@@ -99,8 +157,228 @@ class _DsGalleryPageState extends State<DsGalleryPage> {
 
   Widget _buildPage(BuildContext context, {required bool canToggleTheme}) {
     final s = context.dsSpacing.spacing;
+    final tabs = _kGalleryTabs;
+    final currentTab = tabs[_tabIndex];
 
-    final navItems = <AppNavigationItem>[
+    return AppScaffold(
+      appBar: AppAppBar(
+        title: currentTab.title,
+        actions: <Widget>[
+          if (canToggleTheme)
+            _ThemeModeToggle(
+              mode: _mode,
+              onChanged: (m) => setState(() => _mode = m),
+            ),
+          AppIconButton(
+            icon: Icons.tune_outlined,
+            semanticsLabel: 'Open settings',
+            variant: AppButtonVariant.ghost,
+            onPressed: () => setState(() => _tabIndex = 4),
+          ),
+        ],
+      ),
+      bodyBehavior: AppScaffoldBodyBehavior.plain,
+      bottomNavigationBar: AppBottomBar(
+        items: tabs.map((e) => e.item).toList(growable: false),
+        selectedIndex: _tabIndex,
+        onSelected: (i) => setState(() => _tabIndex = i),
+      ),
+      body: AnimatedSwitcher(
+        duration: MotionDurations.medium,
+        child: KeyedSubtree(
+          key: ValueKey<int>(_tabIndex),
+          child: _buildTabBody(context, _tabIndex),
+        ),
+      ),
+    );
+  }
+
+  EdgeInsets _pagePadding(BuildContext context) {
+    final s = context.dsSpacing.spacing;
+    return context.dsSpacing.symmetric(
+      horizontal: s.pagePadding,
+      vertical: s.lg,
+    );
+  }
+
+  Widget _buildTabBody(BuildContext context, int index) {
+    switch (index) {
+      case 0:
+        return _buildOverviewTab(context);
+      case 1:
+        return _buildFoundationsTab(context);
+      case 2:
+        return _buildComponentsTab(context);
+      case 3:
+        return _buildFeedbackTab(context);
+      case 4:
+        return _buildSettingsTab(context);
+      default:
+        return _buildOverviewTab(context);
+    }
+  }
+
+  Widget _buildOverviewTab(BuildContext context) {
+    final s = context.dsSpacing.spacing;
+    return ListView(
+      padding: _pagePadding(context),
+      children: <Widget>[
+        AppCard(
+          variant: AppCardVariant.elevated,
+          header: Text('Design System Gallery', style: context.text.titleLarge),
+          child: Text(
+            'Preview DS foundations + components under the current theme. '
+            'Use Settings to switch System vs Preset + Brand (system only).',
+            style: context.text.bodyMedium,
+          ),
+          footer: Wrap(
+            spacing: s.sm,
+            runSpacing: s.sm,
+            children: <Widget>[
+              AppButton(
+                label: 'Foundations',
+                variant: AppButtonVariant.secondary,
+                onPressed: () => setState(() => _tabIndex = 1),
+              ),
+              AppButton(
+                label: 'Components',
+                variant: AppButtonVariant.secondary,
+                onPressed: () => setState(() => _tabIndex = 2),
+              ),
+              AppButton(
+                label: 'Feedback',
+                variant: AppButtonVariant.secondary,
+                onPressed: () => setState(() => _tabIndex = 3),
+              ),
+              AppButton(
+                label: 'Settings',
+                variant: AppButtonVariant.primary,
+                onPressed: () => setState(() => _tabIndex = 4),
+              ),
+            ],
+          ),
+        ),
+        SizedBox(height: s.lg),
+        AppCard(
+          variant: AppCardVariant.outlined,
+          header: Text('Quick checks', style: context.text.titleMedium),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: <Widget>[
+              Text(
+                '• Verify contrast in Light/Dark',
+                style: context.text.bodyMedium,
+              ),
+              SizedBox(height: s.xs),
+              Text(
+                '• Verify preset tone is fixed (no split light/dark)',
+                style: context.text.bodyMedium,
+              ),
+              SizedBox(height: s.xs),
+              Text(
+                '• Verify brand only changes in System mode',
+                style: context.text.bodyMedium,
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildFoundationsTab(BuildContext context) {
+    final s = context.dsSpacing.spacing;
+    final scheme = Theme.of(context).colorScheme;
+    final t = Theme.of(context).textTheme;
+
+    return ListView(
+      padding: _pagePadding(context),
+      children: <Widget>[
+        AppCard(
+          variant: AppCardVariant.outlined,
+          header: Text('Colors', style: context.text.titleMedium),
+          child: Wrap(
+            spacing: s.sm,
+            runSpacing: s.sm,
+            children: <Widget>[
+              _ColorSwatch(
+                label: 'Primary',
+                bg: scheme.primary,
+                fg: scheme.onPrimary,
+              ),
+              _ColorSwatch(
+                label: 'Secondary',
+                bg: scheme.secondary,
+                fg: scheme.onSecondary,
+              ),
+              _ColorSwatch(
+                label: 'Tertiary',
+                bg: scheme.tertiary,
+                fg: scheme.onTertiary,
+              ),
+              _ColorSwatch(
+                label: 'Surface',
+                bg: scheme.surface,
+                fg: scheme.onSurface,
+              ),
+              _ColorSwatch(
+                label: 'Background',
+                bg: scheme.background,
+                fg: scheme.onBackground,
+              ),
+              _ColorSwatch(
+                label: 'Error',
+                bg: scheme.error,
+                fg: scheme.onError,
+              ),
+            ],
+          ),
+        ),
+        SizedBox(height: s.lg),
+        AppCard(
+          variant: AppCardVariant.outlined,
+          header: Text('Typography', style: context.text.titleMedium),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: <Widget>[
+              Text('Title Large', style: t.titleLarge),
+              SizedBox(height: s.xs),
+              Text('Title Medium', style: t.titleMedium),
+              SizedBox(height: s.xs),
+              Text('Body Medium', style: t.bodyMedium),
+              SizedBox(height: s.xs),
+              Text('Body Small', style: t.bodySmall),
+              SizedBox(height: s.xs),
+              Text('Label Large', style: t.labelLarge),
+            ],
+          ),
+        ),
+        SizedBox(height: s.lg),
+        AppCard(
+          variant: AppCardVariant.outlined,
+          header: Text('Spacing tokens', style: context.text.titleMedium),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: <Widget>[
+              _KeyValueRow(label: 'pagePadding', value: '${s.pagePadding}'),
+              _KeyValueRow(label: 'sectionGap', value: '${s.sectionGap}'),
+              _KeyValueRow(label: 'itemGap', value: '${s.itemGap}'),
+              _KeyValueRow(
+                label: 'xs / sm / md',
+                value: '${s.xs} / ${s.sm} / ${s.md}',
+              ),
+              _KeyValueRow(label: 'lg / xl', value: '${s.lg} / ${s.xl}'),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildComponentsTab(BuildContext context) {
+    final s = context.dsSpacing.spacing;
+
+    final previewItems = <AppNavigationItem>[
       const AppNavigationItem(
         id: 'home',
         label: 'Home',
@@ -128,62 +406,132 @@ class _DsGalleryPageState extends State<DsGalleryPage> {
       ),
     ];
 
-    return AppScaffold(
-      appBar: AppAppBar(
-        title: 'DS Gallery',
-        actions: <Widget>[
-          if (canToggleTheme)
-            _ThemeModeToggle(
-              mode: _mode,
-              onChanged: (m) => setState(() => _mode = m),
-            ),
-          AppIconButton(
-            icon: _useCenterActionBottomBar
-                ? Icons.add_circle
-                : Icons.add_circle_outline,
-            semanticsLabel: 'Toggle center action bottom bar',
-            variant: AppButtonVariant.ghost,
-            onPressed: () => setState(
-              () => _useCenterActionBottomBar = !_useCenterActionBottomBar,
-            ),
+    return ListView(
+      padding: _pagePadding(context),
+      children: <Widget>[
+        AppCard(
+          variant: AppCardVariant.elevated,
+          header: Text('Buttons', style: context.text.titleMedium),
+          child: _ButtonsDemo(onShowSnackBar: _showSnackBar),
+        ),
+        SizedBox(height: s.lg),
+        const AppCard(
+          variant: AppCardVariant.elevated,
+          header: Text('Cards'),
+          child: _CardsDemo(),
+        ),
+        SizedBox(height: s.lg),
+        AppCard(
+          variant: AppCardVariant.elevated,
+          header: Text('Inputs', style: context.text.titleMedium),
+          child: _InputsDemo(
+            nameCtrl: _nameCtrl,
+            dateCtrl: _dateCtrl,
+            enabled: _inputsEnabled,
+            showErrors: _showInputErrors,
+            dropdownValue: _dropdownValue,
+            onEnabledChanged: (v) => setState(() => _inputsEnabled = v),
+            onShowErrorsChanged: (v) => setState(() => _showInputErrors = v),
+            onDropdownChanged: (v) => setState(() => _dropdownValue = v),
           ),
-        ],
-      ),
-      drawer: AppDrawer(
-        header: Text('Design System', style: context.text.titleLarge),
-        items: navItems,
-        selectedId: navItems[_bottomBarIndex].id,
-        onSelected: (item) {
-          final idx = navItems.indexWhere((e) => e.id == item.id);
-          if (idx >= 0) {
-            Navigator.of(context).pop();
-            setState(() => _bottomBarIndex = idx);
-          }
-        },
-      ),
-      bottomNavigationBar: _useCenterActionBottomBar
-          ? AppBottomBarCenterAction(
-              items: navItems,
-              selectedIndex: _bottomBarIndex,
-              onSelected: (i) => setState(() => _bottomBarIndex = i),
-              centerActionSemanticsLabel: 'Add transaction',
-              centerAction: FloatingActionButton(
-                onPressed: () => _showSnackBar(context, AppFeedbackTone.info),
-                child: const Icon(Icons.add),
+        ),
+        SizedBox(height: s.lg),
+        const AppCard(
+          variant: AppCardVariant.elevated,
+          header: Text('Data display'),
+          child: _DataDisplayDemo(),
+        ),
+        SizedBox(height: s.lg),
+        AppCard(
+          variant: AppCardVariant.elevated,
+          header: Text('Navigation', style: context.text.titleMedium),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: <Widget>[
+              Wrap(
+                spacing: s.sm,
+                runSpacing: s.sm,
+                children: <Widget>[
+                  AppChip(
+                    label: 'Bottom bar',
+                    selected: !_navPreviewUseCenterAction,
+                    onSelected: (_) =>
+                        setState(() => _navPreviewUseCenterAction = false),
+                  ),
+                  AppChip(
+                    label: 'Center action',
+                    selected: _navPreviewUseCenterAction,
+                    onSelected: (_) =>
+                        setState(() => _navPreviewUseCenterAction = true),
+                  ),
+                ],
               ),
-            )
-          : AppBottomBar(
-              items: navItems,
-              selectedIndex: _bottomBarIndex,
-              onSelected: (i) => setState(() => _bottomBarIndex = i),
-            ),
-      body: Column(
-        children: [
-          const DsGalleryThemeControls(),
-          const Divider(height: 1),
-          Expanded(child: _buildPageBody(_bottomBarIndex)),
-        ],
-      ),
+              SizedBox(height: s.md),
+              DecoratedBox(
+                decoration: BoxDecoration(
+                  border: Border.all(
+                    color: Theme.of(context).colorScheme.outlineVariant,
+                  ),
+                  borderRadius: context.dsRadii.md,
+                ),
+                child: _navPreviewUseCenterAction
+                    ? AppBottomBarCenterAction(
+                        items: previewItems,
+                        selectedIndex: _navPreviewIndex,
+                        onSelected: (i) => setState(() => _navPreviewIndex = i),
+                        centerActionSemanticsLabel: 'Primary action',
+                        centerAction: FloatingActionButton(
+                          onPressed: () =>
+                              _showSnackBar(context, AppFeedbackTone.info),
+                          child: const Icon(Icons.add),
+                        ),
+                      )
+                    : AppBottomBar(
+                        items: previewItems,
+                        selectedIndex: _navPreviewIndex,
+                        onSelected: (i) => setState(() => _navPreviewIndex = i),
+                      ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildFeedbackTab(BuildContext context) {
+    final s = context.dsSpacing.spacing;
+    return ListView(
+      padding: _pagePadding(context),
+      children: <Widget>[
+        AppCard(
+          variant: AppCardVariant.elevated,
+          header: Text(
+            'Snackbars / Toasts / States',
+            style: context.text.titleMedium,
+          ),
+          child: _FeedbackDemo(
+            onShowSnackBar: _showSnackBar,
+            onShowToast: _showToast,
+          ),
+        ),
+        SizedBox(height: s.lg),
+        AppCard(
+          variant: AppCardVariant.elevated,
+          header: Text('Dialogs & Sheets', style: context.text.titleMedium),
+          child: _DialogsDemo(
+            onShowAlert: _showAlertDialog,
+            onShowSheet: _showBottomSheet,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildSettingsTab(BuildContext context) {
+    return ListView(
+      padding: _pagePadding(context),
+      children: const <Widget>[DsGalleryThemeControls()],
     );
   }
 
@@ -275,37 +623,6 @@ class _DsGalleryPageState extends State<DsGalleryPage> {
           ),
         );
       },
-    );
-  }
-
-  Widget _buildPageBody(int index) {
-    switch (index) {
-      case 0:
-        return _demoList('Home');
-      case 1:
-        return _demoList('Pay');
-      case 2:
-        return _demoList('Profile');
-      case 3:
-        return _demoList('More');
-      default:
-        return _demoList('Unknown');
-    }
-  }
-
-  Widget _demoList(String title) {
-    return ListView.builder(
-      padding: const EdgeInsets.all(16),
-      itemCount: 40,
-      itemBuilder: (context, i) => Padding(
-        padding: const EdgeInsets.only(bottom: 12),
-        child: AppCard(
-          child: ListTile(
-            title: Text('$title item $i'),
-            subtitle: const Text('Scroll down to test FAB overlap.'),
-          ),
-        ),
-      ),
     );
   }
 
@@ -743,6 +1060,7 @@ class _FeedbackDemo extends StatelessWidget {
   }
 }
 
+@immutable
 class DsGalleryThemeControls extends StatelessWidget {
   const DsGalleryThemeControls({super.key});
 
@@ -755,14 +1073,17 @@ class DsGalleryThemeControls extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final controller = _maybeController(context);
+    final s = context.dsSpacing.spacing;
 
     if (controller == null) {
-      return const Padding(
-        padding: EdgeInsets.all(12),
+      return AppCard(
+        variant: AppCardVariant.outlined,
+        header: Text('Theme Controls', style: context.text.titleMedium),
         child: Text(
           'ThemeControllerScope not found.\n'
           'DsGallery cannot control app theme.\n'
           'Ensure App.builder wraps child with ThemeControllerScope.',
+          style: context.text.bodyMedium,
         ),
       );
     }
@@ -771,11 +1092,13 @@ class DsGalleryThemeControls extends StatelessWidget {
       ..sort((a, b) => a.displayName.compareTo(b.displayName));
 
     if (presets.isEmpty) {
-      return const Padding(
-        padding: EdgeInsets.all(12),
+      return AppCard(
+        variant: AppCardVariant.outlined,
+        header: Text('Theme Controls', style: context.text.titleMedium),
         child: Text(
           'No palette presets registered.\n'
           'Did you register presets in bootstrap()?',
+          style: context.text.bodyMedium,
         ),
       );
     }
@@ -803,94 +1126,99 @@ class DsGalleryThemeControls extends StatelessWidget {
             ? config.brandId
             : null;
 
-        return Card(
-          margin: const EdgeInsets.fromLTRB(12, 12, 12, 8),
-          child: Padding(
-            padding: const EdgeInsets.all(12),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text(
-                  'Theme Controls',
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
-                ),
-                const SizedBox(height: 12),
+        return AppCard(
+          variant: AppCardVariant.elevated,
+          header: Text('Theme Controls', style: context.text.titleMedium),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              SizedBox(height: s.xs),
 
-                // Selection type: System vs Presets
-                SegmentedButton<ThemeSelectionType>(
-                  segments: const [
-                    ButtonSegment(
-                      value: ThemeSelectionType.systemBased,
-                      label: Text('System'),
-                    ),
-                    ButtonSegment(
-                      value: ThemeSelectionType.presetBased,
-                      label: Text('Presets'),
-                    ),
-                  ],
-                  selected: {selectionType},
-                  onSelectionChanged: (set) {
-                    final v = set.first;
-                    controller.setSelectionType(v);
-                  },
-                ),
-
-                const SizedBox(height: 12),
-
-                if (selectionType == ThemeSelectionType.systemBased) ...[
-                  // System mode: allow ThemeMode + Brand selection
-                  Wrap(
-                    spacing: 8,
-                    runSpacing: 8,
-                    crossAxisAlignment: WrapCrossAlignment.center,
-                    children: [
-                      const Text('Mode:'),
-                      SegmentedButton<ThemeMode>(
-                        segments: const [
-                          ButtonSegment(
-                            value: ThemeMode.system,
-                            label: Text('System'),
-                          ),
-                          ButtonSegment(
-                            value: ThemeMode.light,
-                            label: Text('Light'),
-                          ),
-                          ButtonSegment(
-                            value: ThemeMode.dark,
-                            label: Text('Dark'),
-                          ),
-                        ],
-                        selected: {currentMode},
-                        onSelectionChanged: (set) {
-                          controller.setThemeMode(set.first);
-                        },
-                      ),
-                    ],
+              // Selection type: System vs Presets
+              SegmentedButton<ThemeSelectionType>(
+                segments: const <ButtonSegment<ThemeSelectionType>>[
+                  ButtonSegment(
+                    value: ThemeSelectionType.systemBased,
+                    label: Text('System'),
                   ),
-                  const SizedBox(height: 12),
-                  _BrandPickerSection(
-                    title: 'Brand color (System mode only)',
-                    selectedBrandId: selectedBrandId,
-                    onSelect: (id) => controller.setBrandColor(id),
-                  ),
-                  const SizedBox(height: 4),
-                  const Text(
-                    'Default palette (light/dark) is controlled by ThemeDefaults.',
-                    style: TextStyle(fontSize: 12),
-                  ),
-                ] else ...[
-                  // Preset mode: choose preset, tone is fixed by preset.toneBrightness
-                  _PresetPickerSection(
-                    title: 'Preset (fixed tone)',
-                    presets: presets,
-                    selectedPresetId: selectedPresetId,
-                    onSelect: (id) {
-                      if (id != null) controller.setPalettePreset(id);
-                    },
+                  ButtonSegment(
+                    value: ThemeSelectionType.presetBased,
+                    label: Text('Presets'),
                   ),
                 ],
+                selected: <ThemeSelectionType>{selectionType},
+                onSelectionChanged: (set) {
+                  controller.setSelectionType(set.first);
+                },
+              ),
+
+              SizedBox(height: s.md),
+
+              if (selectionType == ThemeSelectionType.systemBased) ...[
+                Text('Mode', style: context.text.titleMedium),
+                SizedBox(height: s.xs),
+                SegmentedButton<ThemeMode>(
+                  segments: const <ButtonSegment<ThemeMode>>[
+                    ButtonSegment(
+                      value: ThemeMode.system,
+                      label: Text('System'),
+                    ),
+                    ButtonSegment(value: ThemeMode.light, label: Text('Light')),
+                    ButtonSegment(value: ThemeMode.dark, label: Text('Dark')),
+                  ],
+                  selected: <ThemeMode>{currentMode},
+                  onSelectionChanged: (set) =>
+                      controller.setThemeMode(set.first),
+                ),
+              ] else ...[
+                Text(
+                  'Preset tone is fixed (light OR dark).',
+                  style: context.text.bodyMedium,
+                ),
+                SizedBox(height: s.xs),
+                Text(
+                  'When selecting a preset, the app theme switches immediately.',
+                  style: context.text.bodyMedium,
+                ),
               ],
-            ),
+
+              if (selectionType == ThemeSelectionType.systemBased) ...[
+                SizedBox(height: s.lg),
+                _BrandPickerSection(
+                  title: 'Brand color (System mode only)',
+                  selectedBrandId: selectedBrandId,
+                  onSelect: (id) => controller.setBrandColor(id),
+                ),
+                SizedBox(height: s.xs),
+                Text(
+                  'Default palette (light/dark) is controlled by ThemeDefaults.',
+                  style: context.text.bodySmall,
+                ),
+              ] else ...[
+                SizedBox(height: s.lg),
+                _PresetPickerSection(
+                  title: 'Presets (Light tone)',
+                  presets: presets
+                      .where((p) => p.toneBrightness == Brightness.light)
+                      .toList(),
+                  selectedPresetId: selectedPresetId,
+                  onSelect: (id) {
+                    if (id != null) controller.setPalettePreset(id);
+                  },
+                ),
+                SizedBox(height: s.lg),
+                _PresetPickerSection(
+                  title: 'Presets (Dark tone)',
+                  presets: presets
+                      .where((p) => p.toneBrightness == Brightness.dark)
+                      .toList(),
+                  selectedPresetId: selectedPresetId,
+                  onSelect: (id) {
+                    if (id != null) controller.setPalettePreset(id);
+                  },
+                ),
+              ],
+            ],
           ),
         );
       },
@@ -913,17 +1241,20 @@ class _PresetPickerSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final s = context.dsSpacing.spacing;
+
+    if (presets.isEmpty) {
+      return Text('No presets', style: context.text.bodyMedium);
+    }
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          title,
-          style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
-        ),
-        const SizedBox(height: 6),
+        Text(title, style: context.text.titleSmall),
+        SizedBox(height: s.xs),
         Wrap(
-          spacing: 8,
-          runSpacing: 8,
+          spacing: s.sm,
+          runSpacing: s.sm,
           children: [
             for (final p in presets)
               ChoiceChip(
@@ -936,7 +1267,7 @@ class _PresetPickerSection extends StatelessWidget {
                       borderColor: Theme.of(context).colorScheme.outlineVariant,
                       size: 12,
                     ),
-                    const SizedBox(width: 6),
+                    SizedBox(width: s.xs),
                     Text(p.displayName),
                   ],
                 ),
@@ -963,18 +1294,17 @@ class _BrandPickerSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final s = context.dsSpacing.spacing;
     final options = BrandDefaults.options;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          title,
-          style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
-        ),
-        const SizedBox(height: 6),
+        Text(title, style: context.text.titleSmall),
+        SizedBox(height: s.xs),
         Wrap(
-          spacing: 8,
-          runSpacing: 8,
+          spacing: s.sm,
+          runSpacing: s.sm,
           children: [
             for (final o in options)
               ChoiceChip(
@@ -989,7 +1319,7 @@ class _BrandPickerSection extends StatelessWidget {
                         shape: BoxShape.circle,
                       ),
                     ),
-                    const SizedBox(width: 6),
+                    SizedBox(width: s.xs),
                     Text(o.displayName),
                   ],
                 ),
@@ -1031,6 +1361,45 @@ class _SplitColorDot extends StatelessWidget {
         children: [
           Expanded(child: ColoredBox(color: left)),
           Expanded(child: ColoredBox(color: right)),
+        ],
+      ),
+    );
+  }
+}
+
+@immutable
+class _ColorSwatch extends StatelessWidget {
+  final String label;
+  final Color bg;
+  final Color fg;
+  const _ColorSwatch({required this.label, required this.bg, required this.fg});
+
+  @override
+  Widget build(BuildContext context) {
+    final s = context.dsSpacing.spacing;
+    return Container(
+      padding: context.dsSpacing.symmetric(horizontal: s.md, vertical: s.sm),
+      decoration: BoxDecoration(color: bg, borderRadius: context.dsRadii.sm),
+      child: Text(label, style: context.text.labelLarge?.copyWith(color: fg)),
+    );
+  }
+}
+
+@immutable
+class _KeyValueRow extends StatelessWidget {
+  final String label;
+  final String value;
+  const _KeyValueRow({required this.label, required this.value});
+
+  @override
+  Widget build(BuildContext context) {
+    final s = context.dsSpacing.spacing;
+    return Padding(
+      padding: context.dsSpacing.only(bottom: s.xs),
+      child: Row(
+        children: <Widget>[
+          Expanded(child: Text(label, style: context.text.bodyMedium)),
+          Text(value, style: context.text.bodySmall),
         ],
       ),
     );
